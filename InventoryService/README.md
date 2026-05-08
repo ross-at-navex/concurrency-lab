@@ -50,7 +50,7 @@ StockQuantity >= 0
 2. Check available stock
 3. Create order
 4. Decrement stock
-5. Save changes
+5. Save changes to product stock, insert new order
 
 The same logical operation is implemented multiple ways to observe different concurrency behaviors.
 
@@ -162,3 +162,7 @@ This project is successful if you can:
 - Reproduce concurrency bugs on demand
 - Fix them using multiple techniques
 - Clearly explain when each approach is appropriate
+
+
+## Up next
+- Add code first database creation for postgres
