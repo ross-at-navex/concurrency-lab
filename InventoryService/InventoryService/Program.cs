@@ -1,8 +1,13 @@
-// unset:warning
+using InventoryService.Database;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<InventoryContext>(options =>
+    options
+        .UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=password")
+        .UseSnakeCaseNamingConvention()
+);
 
 builder.Services.AddControllers();
 
