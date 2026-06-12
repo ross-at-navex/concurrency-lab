@@ -41,8 +41,8 @@ StockQuantity >= 0
 
 1. Read product
 2. Check available stock
-4. Decrement stock
-5. Save changes to product stock
+3. Decrement stock
+4. Save changes to product stock
 
 The same logical operation is implemented multiple ways to observe different concurrency behaviors.
 
