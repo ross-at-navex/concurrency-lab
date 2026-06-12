@@ -28,13 +28,6 @@ If a feature does not help explain concurrency, it does not belong in this proje
 - `RowVersion` (used for optimistic concurrency experiments)
 - `LastUpdatedAt`
 
-### Order
-
-- `Id`
-- `ProductId`
-- `Quantity`
-- `CreatedAt`
-
 **Invariant (often violated on purpose):**
 ```
 StockQuantity >= 0
