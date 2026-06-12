@@ -1,4 +1,5 @@
 using InventoryService.Database;
+using InventoryService.Filters;
 using InventoryService.Models;
 using InventoryService.Objects;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,10 @@ public class InventoryController(InventoryContext _context) : ControllerBase
 
     [HttpPatch]
     [Route("{product}")]
+    [ServiceFilter(typeof(ValidateProductOrderFilter))]
     public async Task<int> UpdateInventoryAsync(string product, ProductOrder order)
     {
         var item = await _context.Products.SingleAsync(p => p.Name == product);
-
-        if (order.Quantity > item.StockQuantity)
-        {
-            throw new InvalidOperationException("Order quantity exceeds existing product stock");
-        }
-
         item.StockQuantity -= order.Quantity;
         item.LastUpdated = DateTime.UtcNow;
         await _context.SaveChangesAsync();
@@ -35,16 +31,11 @@ public class InventoryController(InventoryContext _context) : ControllerBase
     }
 
     // TODO: return a ProductCreateResponse instead of the Product entity directly
-    // TODO: add validation middleware
     // TODO: add exception handling middleware
     [HttpPost]
+    [ServiceFilter(typeof(ValidateProductCreateRequestFilter))]
     public async Task<Product> CreateProductAsync(ProductCreateRequest productToCreate)
     {
-        if (productToCreate.StockQuantity < 0)
-        {
-            throw new InvalidOperationException("Cannot create a product with an inventory less than 0");
-        }
-
         var product = new Product
         {
             Name = productToCreate.Name,

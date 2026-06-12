@@ -1,4 +1,5 @@
 using InventoryService.Database;
+using InventoryService.Filters;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<InventoryContext>(options =>
 );
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<ValidateProductOrderFilter>();
+builder.Services.AddScoped<ValidateProductCreateRequestFilter>();
 
 var app = builder.Build();
 
