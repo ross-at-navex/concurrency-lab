@@ -11,6 +11,8 @@ namespace InventoryService.Controllers;
 [Route("[controller]")]
 public class InventoryController(InventoryContext _context) : ControllerBase
 {
+    static readonly SemaphoreSlim _sem = new SemaphoreSlim(1,1);
+
     [HttpGet("{product}")]
     public async Task<int> GetInventoryAsync(string product)
     {
@@ -23,11 +25,20 @@ public class InventoryController(InventoryContext _context) : ControllerBase
     [ServiceFilter(typeof(ValidateProductOrderFilter))]
     public async Task<int> UpdateInventoryAsync(string product, ProductOrder order)
     {
-        var item = await _context.Products.SingleAsync(p => p.Name == product);
-        item.StockQuantity -= order.Quantity;
-        item.LastUpdated = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-        return item.StockQuantity;
+        await _sem.WaitAsync();
+
+        try
+        {
+            var item = await _context.Products.SingleAsync(p => p.Name == product);
+            item.StockQuantity -= order.Quantity;
+            item.LastUpdated = DateTime.UtcNow;
+            await _context.SaveChangesAsync().ConfigureAwait(true);
+            return item.StockQuantity;
+        }
+        finally
+        {
+            _sem.Release();
+        }
     }
 
     // TODO: return a ProductCreateResponse instead of the Product entity directly

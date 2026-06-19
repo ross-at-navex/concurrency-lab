@@ -20,7 +20,7 @@ public class ValidateProductOrderFilter(InventoryContext _context) : IAsyncActio
 
         var productName = context.ActionArguments["product"] as string;
 
-        var product = await _context.Products.SingleOrDefaultAsync(x => x.Name == productName);
+        var product = await _context.Products.AsNoTracking().SingleOrDefaultAsync(x => x.Name == productName);
         if (product is null)
         {
             context.Result = new BadRequestObjectResult($"Requested product {productName} does not exist.");
