@@ -158,3 +158,8 @@ This project is successful if you can:
 
 ## Up next
 - Add code first database creation for postgres
+
+
+## Notes
+Folder by feature vs folder by type
+Task eliding .NET

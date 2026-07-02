@@ -1,5 +1,6 @@
 using InventoryService.Database;
 using InventoryService.Filters;
+using InventoryService.Locking;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddDbContext<InventoryContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<ValidateProductOrderFilter>();
 builder.Services.AddScoped<ValidateProductCreateRequestFilter>();
+builder.Services.AddScoped<LockFilter>();
+builder.Services.AddSingleton<ISemaphoreSlimWrapper, SemaphoreSlimWrapper>();
 
 var app = builder.Build();
 

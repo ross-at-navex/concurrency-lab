@@ -1,5 +1,6 @@
 using InventoryService.Database;
 using InventoryService.Filters;
+using InventoryService.Locking;
 using InventoryService.Models;
 using InventoryService.Objects;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +12,6 @@ namespace InventoryService.Controllers;
 [Route("[controller]")]
 public class InventoryController(InventoryContext _context) : ControllerBase
 {
-    static readonly SemaphoreSlim _sem = new SemaphoreSlim(1,1);
-
     [HttpGet("{product}")]
     public async Task<int> GetInventoryAsync(string product)
     {
@@ -22,23 +21,15 @@ public class InventoryController(InventoryContext _context) : ControllerBase
 
     [HttpPatch]
     [Route("{product}")]
+    [ServiceFilter(typeof(LockFilter))]
     [ServiceFilter(typeof(ValidateProductOrderFilter))]
     public async Task<int> UpdateInventoryAsync(string product, ProductOrder order)
     {
-        await _sem.WaitAsync();
-
-        try
-        {
-            var item = await _context.Products.SingleAsync(p => p.Name == product);
-            item.StockQuantity -= order.Quantity;
-            item.LastUpdated = DateTime.UtcNow;
-            await _context.SaveChangesAsync().ConfigureAwait(true);
-            return item.StockQuantity;
-        }
-        finally
-        {
-            _sem.Release();
-        }
+        var item = await _context.Products.SingleAsync(p => p.Name == product);
+        item.StockQuantity -= order.Quantity;
+        item.LastUpdated = DateTime.UtcNow;
+        await _context.SaveChangesAsync().ConfigureAwait(true);
+        return item.StockQuantity;
     }
 
     // TODO: return a ProductCreateResponse instead of the Product entity directly
